@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="../static/vendor/css/bootstrap.min.css">
+
+    <script type="text/javascript" src="../static/vendor/jquery/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript" src="../static/vendor/js/bootstrap.min.js"></script>
+
+    <script src="../static/index.js"></script>
+    <style>
+.btn:focus {
+        box-shadow: none !important;}
+.act{
+  background-color: #dc3545 !important;
+  color : white !important;
+}
+.my_button:hover {
+background-color : Pink;
+color : #C71585;
+}
+
+.wrapper {
+  position: relative;
+  overflow: hidden;
+}
+
+.wrapper:after {
+  content: '';
+  display: block;
+  padding-top: 75%;
+}
+
+.wrapper img {
+  width: auto;
+  height: 100%;
+  max-width: none;
+  position: absolute;
+  left: 50%;
+  top: 0;
+  transform: translateX(-50%);
+}
+
+
+
+
+    </style>
+
+    <script>
+    // После загрузки DOM-дерева (страницы)
+    $(function() {
+        //при нажатии на ссылку, содержащую Thumbnail
+        $('div.wrapper').click(function(e) {
+            //отменить стандартное действие браузера
+            e.preventDefault();
+            //присвоить атрибуту scr элемента img модального окна
+            //значение атрибута scr изображения, которое обёрнуто
+            //вокруг элемента a, на который нажал пользователь
+            $('#image-modal .modal-body img').attr('src', $(this).find('img').attr('src'));
+            //открыть модальное окно
+            $("#image-modal").modal('show');
+        });
+        //при нажатию на изображение внутри модального окна
+        //закрыть его
+        $('#image-modal .modal-body img').on('click', function() {
+            $("#image-modal").modal('hide')
+        });
+    });
+
+
+
+    </script>
+</head>
+
+<body>
+<div class="modal fade" id="image-modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-body mx-auto" style="padding: 0;">
+                <img class="img-responsive center-block img-fluid rounded" src="" alt="">
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="col-md-6 mx-auto">
+    {% for post_id in posts_id %}
+    <div class="card">
+        <div class="wrapper">
+            <img src="https:{{ data[post_id].get_content() }}"
+                 class="card-img-top  img-fluid" alt="...">
+        </div>
+        <div class="card-body">
+            <h5 class="card-title">Image</h5>
+            <p class="card-text"> {{ data[post_id].get_tags() }}</p>
+            <div class="d-grid d-md-flex justify-content-md-end">
+                <button class="btn col-md-2 btn-outline-danger my_button {{ 'act' if post_id in user.get_like_posts_id() }}"
+                        id="like_btn_{{ post_id }}"
+                        type="button" onclick="isClick(this.id)">
+                    LIKE
+                </button>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+</body>
+</html>

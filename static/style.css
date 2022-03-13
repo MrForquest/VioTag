@@ -1,0 +1,57 @@
+.btn:focus {
+        box-shadow: none !important;
+        }
+.maintext_vio {
+  font-size: 4em;
+  display: inline-block;
+  background: rgb(42,146,255);
+   background: linear-gradient(0deg, rgba(42,146,255,1) 0%, rgba(255,0,245,1) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.maintext_tag{
+    display: inline-block;
+    border-radius: 0.4em;
+     width: auto;
+     height: 1.5em;
+    font-size: 4em;
+     padding: 0.1em;
+    padding-bottom: 1.5em;
+    padding-top: 0;
+}
+body{
+ background: repeat url("../static/images/background-2.jpg");
+ }
+ .maintext_vio_ {
+   font-size: 400%;
+   display: inline-block;
+    position: absolute;
+    left: 39.7%;
+   background: rgb(42,146,255);
+    background: linear-gradient(0deg, rgba(42,146,255,1) 0%, rgba(255,0,245,1) 100%);
+   -webkit-background-clip: text;
+   -webkit-text-fill-color: transparent;
+ }
+ .maintext_tag_{
+     display: inline-block;
+      position: absolute;
+         left: 46.3%;
+     border-radius: 40%;
+      width: auto;
+      height: 5%;
+     font-size: 400%;
+     padding-top: 0;
+
+ }
+ .ex_{
+     display: inline-block;
+    position: absolute;
+    left: 46%;
+    top: 58.5%;
+     border-radius: 23%;
+       width: 7%;
+      height: 13.2%;
+     font-size: 400%;
+       background: #dedede;
+      z-index: 1;
+ }
