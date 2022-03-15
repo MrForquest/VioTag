@@ -9,14 +9,17 @@ from sqlalchemy_serializer import SerializerMixin
 
 class User(SqlAlchemyBase, UserMixin, SerializerMixin):
     __tablename__ = 'users'
-    id = sqlalchemy.Column(sqlalchemy.Integer,
-                           primary_key=True, autoincrement=True)
+    id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
     username = sqlalchemy.Column(sqlalchemy.String, index=True, unique=True)
     age = sqlalchemy.Column(sqlalchemy.Integer, nullable=True)
     email = sqlalchemy.Column(sqlalchemy.String, index=True, unique=True)
     hashed_password = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     modified_date = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now)
     posts = orm.relation("Post", back_populates='author')
+    subscriptions = orm.relation("Subscription", primaryjoin="User.id==Subscription.subscriber_id",
+                                 back_populates="subscriber")
+    subscribers = orm.relation("Subscription", primaryjoin="User.id==Subscription.publisher_id",
+                               back_populates="publisher")
     about = sqlalchemy.Column(sqlalchemy.String, nullable=True)
 
     def __repr__(self):
