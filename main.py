@@ -8,6 +8,7 @@ from data.users import User
 from data.posts import Post
 from data.tags import Tag
 from data.subscriptions import Subscription
+from data.comments import Comment
 from forms.user import RegisterForm, LoginForm, AddWorkForm
 from werkzeug.datastructures import MultiDict
 from sqlalchemy import or_
@@ -20,6 +21,9 @@ def main():
     db_session.global_init(db_name)
     db_sess = db_session.create_session()
     user1, user2 = db_sess.query(User).all()
+    print(user1.posts[0].comments.append(Comment(text="cat good",
+                                                 author=user1)))
+    print(user1.posts[0].comments[0])
     print(user1.subscriptions, user2.subscriptions)
     print(user1.subscribers, user2.subscribers[0].modified_date)
 
