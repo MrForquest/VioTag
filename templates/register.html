@@ -95,7 +95,6 @@ body{
 background: repeat url("../static/images/background-2.jpg");
 }
 
-
     </style>
 </head>
 
@@ -107,38 +106,65 @@ background: repeat url("../static/images/background-2.jpg");
             <div class="maintext_tag">Tag</div>
             <div class="ex"></div>
         </div>
-        <h3 class="mx-auto">Регистрация</h3>
-        <form>
+        <h3 class="text-center mx-auto">Регистрация</h3>
+        <form action="" method="post">
+            {{ form.hidden_tag() }}
             <div class="form-group">
-                <label for="InputUserName">Имя пользователя<br>(оно должно быть уникальным)</label>
-                <input type="text" class="form-control" id="InputUserName"
-                       placeholder="Введите имя пользователя">
-                <small id="nameHelp" class="form-text text-danger">Тут будут отображаться
-                    ошибки</small>
+                {{ form.username.label }}<br>
+                {{ form.username(class="form-control", type="text",
+                placeholder="Введите имя пользователя") }}
+                {% for error in form.username.errors %}
+                <p class="alert alert-danger" role="alert">
+                    {{ error }}
+                </p>
+                {% endfor %}
             </div>
             <div class="form-group">
-                <label for="InputEmail1">Email адрес</label>
-                <input type="email" class="form-control" id="InputEmail1"
-                       aria-describedby="emailHelp"
-                       placeholder="Введите ваш email">
-                <small id="emailHelp" class="form-text text-danger">Тут будут отображаться
-                    ошибки</small>
+                {{ form.email.label }}<br>
+                {{ form.email(class="form-control", type="email",
+                placeholder="Введите ваш email") }}
+                {% for error in form.email.errors %}
+                <p class="alert alert-danger" role="alert">
+                    {{ error }}
+                </p>
+                {% endfor %}
             </div>
             <div class="form-group">
-                <label for="InputPassword1">Пароль</label>
-                <input type="password" class="form-control" id="InputPassword1"
-                       placeholder="Пароль">
+                {{ form.age.label }}<br>
+                {{ form.age(class="form-control", type="text",
+                placeholder="Введите ваш возраст(крайне желательно)") }}
+                {% for error in form.age.errors %}
+                <p class="alert alert-danger" role="alert">
+                    {{ error }}
+                </p>
+                {% endfor %}
             </div>
             <div class="form-group">
-                <label for="InputPassword2">Повторите пароль</label>
-                <input type="password" class="form-control" id="InputPassword2"
-                       placeholder="Пароль повторно">
+                {{ form.password.label }}<br>
+                {{ form.password(class="form-control", type="password",
+                placeholder="Пароль") }}
+                {% for error in form.password.errors %}
+                <p class="alert alert-danger" role="alert">
+                    {{ error }}
+                </p>
+                {% endfor %}
+            </div>
+            <div class="form-group">
+                {{ form.password_again.label }}<br>
+                {{ form.password_again(class="form-control", type="password",
+                placeholder="Пароль повторно") }}
+                {% for error in form.password_again.errors %}
+                <p class="alert alert-danger" role="alert">
+                    {{ error }}
+                </p>
+                {% endfor %}
             </div>
             <div class="text-center">
                 <button type="submit" class="btn btn-primary">
                     Подтвердить
                 </button>
             </div>
+            <p class="text-danger" role="alert">{{message}}</p>
         </form>
     </div>
 </div>
