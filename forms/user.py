@@ -41,19 +41,3 @@ class RegisterForm(FlaskForm):
                                                           message="Пароль должно иметь длину от 8 до 40 символов.")])
     password_again = PasswordField('Повторите пароль', validators=[DataRequired()])
     submit = SubmitField('Войти')
-
-
-class AddWorkForm(FlaskForm):
-    job = StringField('Title job', validators=[DataRequired()])
-    team_leader = IntegerField('Team leader id', validators=[DataRequired()])
-    work_size = IntegerField('Work size', validators=[DataRequired()])
-    collaborators = StringField('Collaborators')
-    is_finished = BooleanField('Is job finished?')
-    submit = SubmitField('Submit')
-
-
-class NewsForm(FlaskForm):
-    title = StringField('Заголовок', validators=[DataRequired()])
-    content = TextAreaField("Содержание")
-    is_private = BooleanField("Личное")
-    submit = SubmitField('Применить')
