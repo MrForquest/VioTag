@@ -12,14 +12,21 @@ from data.comments import Comment
 from forms.user import RegisterForm, LoginForm, AddWorkForm
 from werkzeug.datastructures import MultiDict
 from sqlalchemy import or_
+from flask_restful import reqparse, abort, Api, Resource
+from data.all_resources import *
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'werty57i39fj92udifkdb56fwed232z'
 login_manager = LoginManager()
 login_manager.init_app(app)
+api = Api(app)
+api.add_resource(Post_resource, '/api/v1/post/<int:post_id>')
+api.add_resource(Post_list_resource, '/api/v1/posts')
+api.add_resource(Post_comments_resource, '/api/v1/comments_post/<int:post_id>')
+api.add_resource(Comment_resource, '/api/v1/comment/<int:comment_id>')
 
 
-# from flask_restful import reqparse, abort, Api, Resource
+
 @login_manager.user_loader
 def load_user(user_id):
     db_sess = db_session.create_session()
