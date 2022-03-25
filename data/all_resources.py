@@ -4,6 +4,7 @@ from data.posts import Post
 from data.comments import Comment
 from data.tags import Tag
 from flask import jsonify
+import sqlite3
 
 
 def abort_if_not_found(idd, thing):
@@ -42,3 +43,15 @@ class Comment_resource(Resource):
         session = db_session.create_session()
         comm = session.query(Comment).get(comm_id)
         return jsonify({'comment': comm.to_dict()})
+
+
+class Tag_post_resource(Resource):
+    def get(self, tag_id):
+        conn = sqlite3.connect('db/viotag_db.sqlite')
+        cur = conn.cursor()
+        session = db_session.create_session()
+        abort_if_not_found(tag_id, 'Tag_post')
+        posts = cur.execute(f"""SELECT posts FROM post_to_tag WHERE tags = {tag_id}""").fetchall()
+        answ = [i[0] for i in posts]
+        ret = session.query(Post).get(*answ)
+        return jsonify({'posts': [item.to_dict() for item in ret]})

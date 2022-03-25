@@ -1,7 +1,6 @@
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 import datetime
 from flask import Flask, render_template, redirect, request, abort, jsonify, make_response
-from flask_wtf import FlaskForm
 from wtforms.validators import DataRequired
 from data import db_session
 from data.users import User
@@ -9,7 +8,7 @@ from data.posts import Post
 from data.tags import Tag
 from data.subscriptions import Subscription
 from data.comments import Comment
-from forms.user import RegisterForm, LoginForm, AddWorkForm
+from forms.user import RegisterForm, LoginForm
 from werkzeug.datastructures import MultiDict
 from sqlalchemy import or_
 from flask_restful import reqparse, abort, Api, Resource
@@ -24,6 +23,7 @@ api.add_resource(Post_resource, '/api/v1/post/<int:post_id>')
 api.add_resource(Post_list_resource, '/api/v1/posts')
 api.add_resource(Post_comments_resource, '/api/v1/comments_post/<int:post_id>')
 api.add_resource(Comment_resource, '/api/v1/comment/<int:comment_id>')
+api.add_resource(Tag_post_resource, '/api/v1/tag/<int:tag_id>')
 
 
 
@@ -49,7 +49,7 @@ def reqister():
             return render_template('register.html', title='Регистрация',
                                    form=form,
                                    message="Пользователь с такой электронной почтой уже есть")
-        if form.age.data < 4:
+        if form.age.data <= 4:
             return render_template('register.html', title='Регистрация',
                                    form=form,
                                    message="Чтобы зарегистрироваться вам должно быть минимум 5 лет.")
