@@ -69,6 +69,38 @@ def reqister():
     return render_template('register.html', title='Регистрация', form=form)
 
 
+@app.route('/relevant_tags', methods=['GET'])
+def relevant_tags():
+    if request.method == 'GET':
+        name_tag = request.args.get("name_tag")
+        print(name_tag)
+        db_sess = db_session.create_session()
+        tags = db_sess.query(Tag.name, func.count(Post.id)).order_by(
+            func.count(Post.id).desc()).join(
+            Tag.posts).group_by(Tag.id).all()
+        posts = db_sess.query(Post.id).order_by(func.count(Post.id).desc()).join(
+            Tag.posts).group_by(Tag.id).all()
+        stags = process.extract(name_tag, tags, limit=4)
+        stags.sort(key=lambda s: (s[1], s[0][1]), reverse=True)
+
+        return jsonify(
+            list(map(lambda s: {"tag": [{"name": s[0][0]}, {"rs": [s[1], s[0][1]]}]}, stags)))
+
+
+@app.route('/addpost', methods=['GET', 'POST'])
+def add_post():
+    form = AddPostForm()
+    if form.validate_on_submit():
+        print(form.tags.data)
+
+    return render_template('add_post.html', form=form)
+
+
+@app.route('/', methods=['GET'])
+def index():
+    return render_template('index.html')
+
+
 def main():
     db_name = "db/viotag_db.sqlite"
     db_session.global_init(db_name)

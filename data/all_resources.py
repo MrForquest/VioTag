@@ -19,7 +19,7 @@ class Post_resource(Resource):
         abort_if_not_found(post_id, 'Post')
         session = db_session.create_session()
         post = session.query(Post).get(post_id)
-        return jsonify({'post': post.to_dict()})
+        return jsonify({'post': post.to_dict(only=('tags.name', "tags.id", 'text', 'author_id'))})
 
 
 class Post_list_resource(Resource):
@@ -47,11 +47,7 @@ class Comment_resource(Resource):
 
 class Tag_post_resource(Resource):
     def get(self, tag_id):
-        conn = sqlite3.connect('db/viotag_db.sqlite')
-        cur = conn.cursor()
         session = db_session.create_session()
         abort_if_not_found(tag_id, 'Tag_post')
-        posts = cur.execute(f"""SELECT posts FROM post_to_tag WHERE tags = {tag_id}""").fetchall()
-        answ = [i[0] for i in posts]
-        ret = session.query(Post).get(*answ)
+        ret = session.query(Tag).get(tag_id).posts
         return jsonify({'posts': [item.to_dict() for item in ret]})
