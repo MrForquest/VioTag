@@ -1,6 +1,7 @@
 import datetime
 import sqlalchemy
-from sqlalchemy import orm
+from sqlalchemy import orm, case
+from sqlalchemy.ext.hybrid import hybrid_property
 from .db_session import SqlAlchemyBase
 from sqlalchemy_serializer import SerializerMixin
 
@@ -19,6 +20,7 @@ class Tag(SqlAlchemyBase, SerializerMixin):
 
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
     name = sqlalchemy.Column(sqlalchemy.String, nullable=True)
+    posts = orm.relation("Post", secondary="post_to_tag", back_populates="tags")
 
     def __repr__(self):
-        return f"<Tag> {self.name}"
+            return f"<Tag> {self.name}"

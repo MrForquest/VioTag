@@ -10,10 +10,13 @@ from string import ascii_letters
 from faker import Faker
 import faker
 from random import randint, choice, sample
+from fuzzywuzzy import process
+from sqlalchemy import desc
+from sqlalchemy import func
 
 fake = Faker()
 
-Faker.seed(0)
+Faker.seed(1)
 
 
 def generate_fake_bd():
@@ -67,3 +70,20 @@ def read_bd():
     posts = db_sess.query(Post).all()
     print(len(posts[0].tags[2].posts))
     print(len(posts))
+
+
+def read_bd_tags():
+    name_tag = "ph"
+    db_name = "db/viotag_db.sqlite"
+    db_session.global_init(db_name)
+    db_sess = db_session.create_session()
+    posts = db_sess.query(Post, func.count(Post.id)).join(Post.tags).group_by(Post.id).all()
+    tags = db_sess.query(Tag.name, func.count(Post.id)).order_by(func.count(Post.id).desc()).join(
+        Tag.posts).group_by(Tag.id).all()
+    stags = process.extract(name_tag, tags, limit=10)
+    stags.sort(key=lambda s: (s[1], s[0][1]), reverse=True)
+    print(stags)
+
+
+# read_bd_tags()
+generate_fake_bd()

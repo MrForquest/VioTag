@@ -6,14 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <link rel="stylesheet" href="../static/vendor/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../static/style.css">
 
     <script type="text/javascript" src="../static/vendor/jquery/jquery-3.6.0.min.js"></script>
     <script type="text/javascript" src="../static/vendor/js/bootstrap.min.js"></script>
 
     <script src="../static/index.js"></script>
     <style>
-.btn:focus {
-        box-shadow: none !important;}
 .act{
   background-color: #dc3545 !important;
   color : white !important;
@@ -44,9 +43,6 @@ color : #C71585;
   transform: translateX(-50%);
 }
 
-
-
-
     </style>
 
     <script>
@@ -70,8 +66,6 @@ color : #C71585;
         });
     });
 
-
-
     </script>
 </head>
 
@@ -87,24 +81,30 @@ color : #C71585;
 </div>
 
 <div class="col-md-6 mx-auto">
-    {% for post_id in posts_id %}
+
     <div class="card">
         <div class="wrapper">
-            <img src="https:{{ data[post_id].get_content() }}"
+            <img src="https://artplaymedia.ru/upload/iblock/62b/62bd970377c0a6dee202a637f2a28b0a.jpg"
                  class="card-img-top  img-fluid" alt="...">
         </div>
         <div class="card-body">
-            <h5 class="card-title">Image</h5>
-            <p class="card-text"> {{ data[post_id].get_tags() }}</p>
+            <h5 class="card-title"></h5>
+            <p class="card-text"> текст и поста и всё такое</p>
+            <div class="d-flex flex-wrap">
+                <div class="p-2 tag">Flex item 1 Flex item 1</div>
+                <div class="p-2 tag">Flex item 2 Flex item 1</div>
+                <div class="p-2 tag">Flex item </div>
+                <div class="p-2 tag">Flex item Flex item 2 Flex item 1 Flex item 2 Flex item 1 </div>
+            </div>
             <div class="d-grid d-md-flex justify-content-md-end">
-                <button class="btn col-md-2 btn-outline-danger my_button {{ 'act' if post_id in user.get_like_posts_id() }}"
-                        id="like_btn_{{ post_id }}"
+                <button class="btn col-md-2 btn-outline-danger my_button"
+                        id="like_btn_1"
                         type="button" onclick="isClick(this.id)">
                     LIKE
                 </button>
             </div>
         </div>
-        {% endfor %}
+
     </div>
 </div>
 

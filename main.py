@@ -9,9 +9,11 @@ from data.posts import Post
 from data.tags import Tag
 from data.subscriptions import Subscription
 from data.comments import Comment
-from forms.user import RegisterForm, LoginForm, AddWorkForm
+from forms.user import RegisterForm, LoginForm
+from forms.post import AddPostForm
 from werkzeug.datastructures import MultiDict
-from sqlalchemy import or_
+from sqlalchemy import or_, func
+from fuzzywuzzy import process
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'werty57i39fj92udifkdb56fwed232z'
@@ -58,6 +60,38 @@ def reqister():
     return render_template('register.html', title='Регистрация', form=form)
 
 
+@app.route('/relevant_tags', methods=['GET'])
+def relevant_tags():
+    if request.method == 'GET':
+        name_tag = request.args.get("name_tag")
+        print(name_tag)
+        db_sess = db_session.create_session()
+        tags = db_sess.query(Tag.name, func.count(Post.id)).order_by(
+            func.count(Post.id).desc()).join(
+            Tag.posts).group_by(Tag.id).all()
+        posts = db_sess.query(Post.id).order_by(func.count(Post.id).desc()).join(
+            Tag.posts).group_by(Tag.id).all()
+        stags = process.extract(name_tag, tags, limit=4)
+        stags.sort(key=lambda s: (s[1], s[0][1]), reverse=True)
+
+        return jsonify(
+            list(map(lambda s: {"tag": [{"name": s[0][0]}, {"rs": [s[1], s[0][1]]}]}, stags)))
+
+
+@app.route('/addpost', methods=['GET', 'POST'])
+def add_post():
+    form = AddPostForm()
+    if form.validate_on_submit():
+        print(form.tags.data)
+
+    return render_template('add_post.html', form=form)
+
+
+@app.route('/', methods=['GET'])
+def index():
+    return render_template('index.html')
+
+
 def main():
     db_name = "db/viotag_db.sqlite"
     db_session.global_init(db_name)
@@ -66,47 +100,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-"""
-    print(user1.posts[0].comments.append(Comment(text="cat good",
-                                                 author=user1)))
-    print(user1.posts[0].comments[0])
-    print(user1.subscriptions, user2.subscriptions)
-    print(user1.subscribers, user2.subscribers[0].modified_date)
-
-  user1, user2 = db_sess.query(User).all()
-    user1.subscriptions.append(Subscription(subscriber=user1,
-                                            publisher=user2))
-    db_sess.commit()
-        user = User()
-    user.username = "Fool"
-    user.email = "folp11@gmail.com"
-    tag = Tag(
-        name="Mega2Trek"
-    )
-    post = Post(
-        text="lolkek23",
-        src="google"
-    )
-    post.tags.append(tag)
-    user.posts.append(post)
-    db_sess.add(user)
-    db_sess.commit()
-        user1, user2 = db_sess.query(User).all()
-    user1.subscriptions.append(user2)
-    print(user1, user1.subscriptions)
-    print(user2, user2.subscriptions)
-    user1.subscriptions.remove(user2)
-    db_sess.commit()
-"""
-"""
-def main():
-    db_name = "db/viotag_db.sqlite"
-    db_session.global_init(db_name)
-    db_sess = db_session.create_session()
-    user1, user2 = db_sess.query(User).all()
-    posts = db_sess.query(Post).all()
-    print(user2.posts[0].author_id)
-    print(posts[0].comments)
-    print(posts[0].tags)
-    db_sess.commit()
-    """

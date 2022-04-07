@@ -24,7 +24,7 @@ class Post(SqlAlchemyBase, SerializerMixin):
     modified_date = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now)
     author_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("users.id"))
     author = orm.relation('User')
-    tags = orm.relation("Tag", secondary="post_to_tag", backref="posts")
+    tags = orm.relation("Tag", secondary="post_to_tag", back_populates="posts")
     comments = orm.relation('Comment', back_populates="post")
     likes = orm.relation('User', secondary="likes_table", backref="favorite_posts")
 
