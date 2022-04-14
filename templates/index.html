@@ -1,18 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="../static/vendor/css/bootstrap.min.css">
-    <link rel="stylesheet" href="../static/style.css">
+{% extends "base.html" %}
+{% block import %}
+<script src="../static/index.js"></script>
+{% endblock %}
 
-    <script type="text/javascript" src="../static/vendor/jquery/jquery-3.6.0.min.js"></script>
-    <script type="text/javascript" src="../static/vendor/js/bootstrap.min.js"></script>
-
-    <script src="../static/index.js"></script>
-    <style>
+{% block style %}
+<style>
 .act{
   background-color: #dc3545 !important;
   color : white !important;
@@ -42,10 +35,22 @@ color : #C71585;
   top: 0;
   transform: translateX(-50%);
 }
+.nav-link {
+ font-size: 1.5rem;
+}
+.nav-item {
+   padding-right: 1rem;
+}
+ .tag {
+       font-size: 0.9rem;
+        font: 0.9rem Helvetica, sans-serif;
+        font-weight: 500;
+        line-height: 0.8;
+ }
 
-    </style>
+</style>
 
-    <script>
+<script>
     // После загрузки DOM-дерева (страницы)
     $(function() {
         //при нажатии на ссылку, содержащую Thumbnail
@@ -66,15 +71,17 @@ color : #C71585;
         });
     });
 
-    </script>
-</head>
 
-<body>
+</script>
+{% endblock %}
+
+{% block content %}
 <div class="modal fade" id="image-modal" tabindex="-1" role="dialog">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-lg" style="min-width:100%;">
         <div class="modal-content">
-            <div class="modal-body mx-auto" style="padding: 0;">
-                <img class="img-responsive center-block img-fluid rounded" src="" alt="">
+            <div class="modal-body mx-auto" style="min-width:100%;padding:0;">
+                <img class="center-block img-fluid rounded " src=""
+                     alt="упс.. Ошибочка вышла." style="min-width:100%;">
             </div>
         </div>
     </div>
@@ -84,7 +91,7 @@ color : #C71585;
 
     <div class="card">
         <div class="wrapper">
-            <img src="https://artplaymedia.ru/upload/iblock/62b/62bd970377c0a6dee202a637f2a28b0a.jpg"
+            <img src="https://avatars.mds.yandex.net/i?id=a29b5927c8d63f30f8a06566fd438700_l-5661150-images-thumbs&n=27&h=384&w=480"
                  class="card-img-top  img-fluid" alt="...">
         </div>
         <div class="card-body">
@@ -93,8 +100,8 @@ color : #C71585;
             <div class="d-flex flex-wrap">
                 <div class="p-2 tag">Flex item 1 Flex item 1</div>
                 <div class="p-2 tag">Flex item 2 Flex item 1</div>
-                <div class="p-2 tag">Flex item </div>
-                <div class="p-2 tag">Flex item Flex item 2 Flex item 1 Flex item 2 Flex item 1 </div>
+                <div class="p-2 tag">Flex item</div>
+                <div class="p-2 tag">Flex item Flex item 2 Flex item 1 Flex item 2 Flex item 1</div>
             </div>
             <div class="d-grid d-md-flex justify-content-md-end">
                 <button class="btn col-md-2 btn-outline-danger my_button"
@@ -104,9 +111,6 @@ color : #C71585;
                 </button>
             </div>
         </div>
-
     </div>
 </div>
-
-</body>
-</html>
+{% endblock %}

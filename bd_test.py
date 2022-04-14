@@ -86,4 +86,9 @@ def read_bd_tags():
 
 
 # read_bd_tags()
-generate_fake_bd()
+# generate_fake_bd()
+db_name = "db/viotag_db.sqlite"
+db_session.global_init(db_name)
+db_sess = db_session.create_session()
+post = db_sess.query(Post).get(413)
+print(post.tags[1].posts)

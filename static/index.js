@@ -27,3 +27,11 @@
 $(document).ready(function(){
     $(this).scrollTop(0);
 });
+
+$(function() {
+   var elements = document.querySelectorAll('.nav-item');
+   for (var i = 0; i < elements.length; i++) {
+        elements[i].classList.remove("active");
+    }
+   document.querySelector('#main').classList.add("active");
+});

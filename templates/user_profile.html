@@ -1,18 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="../static/vendor/css/bootstrap.min.css">
+{% extends "base.html" %}
+{% block import %}
+<script src="../static/user_profile.js"></script>
+{% endblock %}
 
-    <script type="text/javascript" src="../static/vendor/jquery/jquery-3.6.0.min.js"></script>
-    <script type="text/javascript" src="../static/vendor/js/bootstrap.min.js"></script>
-    <link rel="stylesheet" href="../static/style.css">
-    <script src="../static/index.js"></script>
-    <style>
-
+{% block style %}
+<style>
 .act{
   background-color: #dc3545 !important;
   color : white !important;
@@ -21,18 +13,15 @@
 background-color : Pink;
 color : #C71585;
 }
-
 .wrapper {
   position: relative;
   overflow: hidden;
 }
-
 .wrapper:after {
   content: '';
   display: block;
   padding-top: 75%;
 }
-
 .wrapper img {
   width: auto;
   height: 100%;
@@ -42,113 +31,134 @@ color : #C71585;
   top: 0;
   transform: translateX(-50%);
 }
-.maintext_vio, .maintext_tag{
-font-size: 1.5em;
-}
 .ex{
-    display: block;
+   display: block;
    position: relative;
    left: 40%;
    bottom: 1em;
-    border-radius: 0.4em;
-      width: 1em;
-     height: 1em;
-    font-size: 4em;
-      background: #d6d6d6;
-     z-index: 0;
+   border-radius: 0.4em;
+   width: 1em;
+   height: 1em;
+   font-size: 4em;
+   background: #d6d6d6;
+   z-index: 0;
+}
+.mcont {
+background:#f7f7f7;
+margin-top:1rem;
+border-radius:0.8em;
+}
+.username {
+font-size:2.5rem;
+font-weight:550;
+}
+
+.btnvio {
+ position: relative;
+ z-index: 1;
+ background: rgb(125,67,171);
+ background: linear-gradient(0deg, rgba(125,67,171,1) 0%, rgba(164,71,196,1) 23%, rgba(199,75,208,1) 50%, rgba(237,85,183,1) 100%);
+ border-color: #d000ff;
+}
+.btnvio:active{
+background: #593473 !important;
+border-color: #d000ff !important;
+}
+.btnvio::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(180deg, rgba(125,67,171,1) 0%, rgba(164,71,196,1) 23%, rgba(199,75,208,1) 50%, rgba(237,85,183,1) 100%);
+  opacity: 0;
+  transition: opacity 0.6s;
+  z-index: -1;
+}
+.btnvio:hover::before {
+  opacity: 1;
+}
+.btnvio:active::before {
+ background: #593473 !important;
+border-color: #d000ff !important;
+}
+.addpost {
+position: absolute;
+right:0;
+}
+.avatar_btn {
+height:2em;
+margin:0;
+margin-top:0.3em;
 }
 
 
+</style>
+{% endblock %}
 
-
-
-
-
-
-
-
-
-    </style>
-
-    <script>
-    // После загрузки DOM-дерева (страницы)
-    $(function() {
-        //при нажатии на ссылку, содержащую Thumbnail
-        $('div.wrapper').click(function(e) {
-            //отменить стандартное действие браузера
-            e.preventDefault();
-            //присвоить атрибуту scr элемента img модального окна
-            //значение атрибута scr изображения, которое обёрнуто
-            //вокруг элемента a, на который нажал пользователь
-            $('#image-modal .modal-body img').attr('src', $(this).find('img').attr('src'));
-            //открыть модальное окно
-            $("#image-modal").modal('show');
-        });
-        //при нажатию на изображение внутри модального окна
-        //закрыть его
-        $('#image-modal .modal-body img').on('click', function() {
-            $("#image-modal").modal('hide')
-        });
-    });
-
-    </script>
-</head>
-
-<body>
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <a class="navbar-brand" href="#">
-        <div>
-            <img src="../static/images/viotag_logo.png" style="height:3em;">
-        </div>
-    </a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse"
-            data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
-            aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav mr-auto">
-            <li class="nav-item active">
-                <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#">Link</a>
-            </li>
-            <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
-                   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    Dropdown
-                </a>
-                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                    <a class="dropdown-item" href="#">Action</a>
-                    <a class="dropdown-item" href="#">Another action</a>
-                    <div class="dropdown-divider"></div>
-                    <a class="dropdown-item" href="#">Something else here</a>
-                </div>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link disabled" href="#">Disabled</a>
-            </li>
-        </ul>
-        <form class="form-inline my-2 my-lg-0">
-            <input class="form-control mr-sm-2" type="search" placeholder="Search"
-                   aria-label="Search">
-            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-        </form>
-    </div>
-</nav>
-
-
-<div class="col-md-8 mx-auto container">
-    <div class="row" style="background:red;">
-        <div class="col-4">
-            <img class="rounded float-start img-fluid" src="../static/images/default_avatar.jpg">
-        </div>
-        <div class="col-8">
-            <p class="text-center">Некоторое количество текста</p>
+{% block content %}
+<div class="modal fade" id="image-modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" style="min-width:100%;">
+        <div class="modal-content">
+            <div class="modal-body mx-auto" style="min-width:100%;padding:0;">
+                <img class="center-block img-fluid rounded " src=""
+                     alt="упс.. Ошибочка вышла." style="min-width:100%;">
+            </div>
         </div>
     </div>
 </div>
-</body>
-</html>
+<div class="col-md-8 mx-auto container mcont">
+    <div class="row">
+        <div class="col-12 col-lg-4" style="padding:0;">
+            <img class="rounded float-start img-fluid col-12 mx-auto" style="padding-left:2px;"
+                 src="{{avatar}}" id="avatar">
+            <form class="avatar_btn col-11 col-lg-6 mx-auto" style="padding:0;" method="post"
+                  enctype="multipart/form-data">
+                <label class="btn btnvio btn-primary" style="width:100%;height:100%;">
+                    Изменить аватар <input type="file" accept=".jpg,.gif,.png,.bmp" id="file" hidden>
+                </label>
+            </form>
+        </div>
+        <div class="col-7 col-lg-8" style="padding:0;">
+            <span class="username">{{username}}</span>
+            <p class="text-center" style="font-size:1.2rem">{{about}}</p>
+        </div>
+    </div>
+    <div class="col-5 col-sm-4 col-lg-2 addpost">
+        <a type="submit" class="btn btnvio btn-primary" style="width:100%;" href="/addpost">Добавить
+            пост</a>
+    </div>
+    <div style="margin-top:3em;">
+        {% for post in posts %}
+        <div class="card">
+            {% if post.src %}
+            <div class="wrapper">
+                <img src="{{post.src}}"
+                     class="card-img-top  img-fluid" alt="...">
+            </div>
+            {% else %}
+            {% endif %}
+            <div class="card-body">
+                <h5 class="card-title"></h5>
+                <p style="font-size:0.9rem;margin:0;" class="text-secondary">Время создания:
+                    {{post.modified_date.strftime("%m/%d/%Y, %H:%M")}}</p>
+                <p class="card-text">{{post.text}}</p>
+                <div class="d-flex flex-wrap">
+                    {% for tag in tags %}
+                    <div class="p-2 tag">{{tag.name}}</div>
+                    {% endfor %}
+                </div>
+                <div class="d-grid d-md-flex justify-content-md-end">
+                    <button class="btn col-md-2 btn-outline-danger my_button"
+                            id="like_btn_{{post.id}}"
+                            type="button" onclick="isClick(this.id)">
+                        LIKE
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

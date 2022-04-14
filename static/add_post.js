@@ -59,7 +59,7 @@ function resizeInput() {
 }
 
 function getTags() {
-    var elements = document.querySelectorAll('.tag');;
+    var elements = document.querySelectorAll('.tag');
     let names = [];
      console.log(elements);
     for (var i = 0; i < elements.length; i++) {

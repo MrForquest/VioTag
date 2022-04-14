@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, EmailField, TextAreaField, \
-    IntegerField
+    IntegerField, FileField
 from wtforms.validators import DataRequired, Regexp, Length, EqualTo, NumberRange, ValidationError
 from string import ascii_lowercase, digits, ascii_uppercase
 

@@ -20,6 +20,7 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
     posts = orm.relation("Post", back_populates='author')
     subscriptions = orm.relation("Subscription", primaryjoin="User.id==Subscription.subscriber_id",
                                  back_populates="subscriber")
+    avatar = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     subscribers = orm.relation("Subscription", primaryjoin="User.id==Subscription.publisher_id",
                                back_populates="publisher")
     about = sqlalchemy.Column(sqlalchemy.String, nullable=True)
