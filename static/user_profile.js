@@ -65,3 +65,31 @@ $(document).ready(function() {
 $(document).ready(function(){
     $(this).scrollTop(0);
 });
+function subscribeFunc(user_id) {
+       var elem = document.getElementById("subbtn");
+       if (elem.classList.contains("subscribe")) {
+       elem.innerHTML = "Подписаться";
+       const request = new XMLHttpRequest();
+       request.open('POST', '/subscribe_user');
+       request.onload = () => {
+           const data = JSON.parse(request.responseText);
+       }
+       const data = new FormData();
+       data.append('user_id', user_id);
+       request.send(data);
+       }
+       else {
+       elem.innerHTML = "Отменить подписку";
+       const request = new XMLHttpRequest();
+       request.open('POST', '/subscribe_user');
+       request.onload = () => {
+           const data = JSON.parse(request.responseText);
+       }
+       const data = new FormData();
+       data.append('user_id', user_id);
+       request.send(data);
+       }
+       elem.classList.toggle("subscribe");
+       elem.classList.toggle("btnvio");
+       return false;
+};

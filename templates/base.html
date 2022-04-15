@@ -18,6 +18,7 @@
 .nav-item {
    padding-right: 1rem;
 }
+
     </style>
 </head>
 <body>
@@ -39,7 +40,7 @@
                 <a class="nav-link" href="/">Главная <span class="sr-only">(current)</span></a>
             </li>
             <li class="nav-item" id="profile">
-                <a class="nav-link" href="/profile">Мой профиль</a>
+                <a class="nav-link" href="/profile/{{current_user.username}}.html">Мой профиль</a>
             </li>
         </ul>
         <form class="form-inline my-2 my-lg-0">

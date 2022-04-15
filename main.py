@@ -154,22 +154,27 @@ def index():
     return render_template('index.html', title="Главная")
 
 
-@app.route('/profile', methods=['GET', 'POST'])
-def profile():
+@app.route('/profile/<username>.html', methods=['GET', 'POST'])
+def profile(username):
     db_sess = db_session.create_session()
-    user = db_sess.query(User).get(1)
+    user = db_sess.query(User).get(2)
     login_user(user, remember=True)
+    user = db_sess.query(User).filter(User.username == username).first()
     data = dict()
     data["title"] = "Мой профиль"
-    data["about"] = current_user.about if current_user.about else ""
-    if current_user.avatar is None:
+    data["about"] = user.about if user.about else ""
+    if user.avatar is None:
         data["avatar"] = "../static/images/default_avatar.jpg"
     else:
-        data["avatar"] = "../" + current_user.avatar
-    data["username"] = current_user.username
-    posts = db_sess.query(Post).filter(Post.author_id == current_user.id).order_by(
+        data["avatar"] = "../" + user.avatar
+    data["username"] = user.username
+    sub = db_sess.query(Subscription).filter(Subscription.subscriber_id == current_user.id,
+                                             Subscription.publisher_id == user.id).first()
+    data["u1su2"] = bool(sub)
+    posts = db_sess.query(Post).filter(Post.author_id == user.id).order_by(
         desc(Post.modified_date)).all()
     data["posts"] = posts
+    data["author_id"] = user.id
     return render_template('user_profile.html', **data)
 
 
@@ -192,6 +197,32 @@ def avatar_upload():
         else:
             print("error")
     return jsonify({"success": True})
+
+
+@app.route("/subscribe_user", methods=['POST'])
+def subscribe_upload():
+    db_sess = db_session.create_session()
+    author_id = int(request.form.get("user_id"))
+    author = db_sess.query(User).get(author_id)
+    print(current_user.id, author_id)
+    sub = db_sess.query(Subscription).filter(Subscription.subscriber_id == current_user.id,
+                                             Subscription.publisher_id == author_id).first()
+    print(author_id, sub)
+    if sub:
+        print("delete")
+        db_sess.delete(sub)
+        db_sess.commit()
+        return jsonify({"success": True, "subscribe": False})
+    else:
+        print("add")
+        sub = Subscription(subscriber_id=current_user.id, publisher_id=author_id)
+        # author.subscribers.append(sub)
+        # current_user.subscriptions.append(sub)
+        # rows_changed = db_sess.query(User).filter_by(id=current_user.id).update(
+        #   dict(subscriptions=current_user.subscriptions))
+        db_sess.add(sub)
+        db_sess.commit()
+        return jsonify({"success": True, "subscribe": True})
 
 
 def main():
