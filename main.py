@@ -28,7 +28,7 @@ api = Api(app)
 api.add_resource(Post_resource, '/api/v1/post/<int:post_id>')
 api.add_resource(Post_list_resource, '/api/v1/posts')
 api.add_resource(Post_comments_resource, '/api/v1/comments_post/<int:post_id>')
-api.add_resource(Comment_resource, '/api/v1/comment/<int:comment_id>')
+api.add_resource(Comment_resource, '/api/v1/comment/<int:comm_id>')
 api.add_resource(Tag_post_resource, '/api/v1/tag/<int:tag_id>')
 
 
