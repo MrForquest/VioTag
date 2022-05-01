@@ -1,28 +1,30 @@
- function isClick(btn_id) {
-
+function isClick(btn_id) {
        console.log(btn_id);
         var elem = document.getElementById(btn_id);
-        elem.classList.toggle("act");
-
+        elem.classList.toggle("act")
       // Инициализировать новый запрос
           const request = new XMLHttpRequest();
         //document.querySelector('#currency').value;
-          request.open('POST', '/btn_click_register');
+          request.open('POST', '/btn_like_click');
           // Функция обратного вызова, когда запрос завершен
           request.onload = () => {
               // Извлечение данных JSON из запроса
-
               const data = JSON.parse(request.responseText);
+              if (data["like"]) {
+              console.log(data["like"]);
+              elem.classList.add('act');
+              }
+              else {
+              elem.classList.remove('act');
+              }
           }
-
           // Добавить данные для отправки с запросом
           const data = new FormData();
           data.append('like_btn_id', btn_id);
-
           // Послать запрос
           request.send(data);
          return false;
-      };
+};
 
 $(function() {
     $('div.wrapper').click(function(e) {
@@ -43,13 +45,17 @@ $(document).ready(function() {
     $('#file').on('input', function() {
         var file = this.files[0];
         var fReader = new FileReader();
+        var path = "";
         fReader.readAsDataURL(file);
         fReader.onloadend = function(event){
-        var img = document.getElementById("avatar");
-        img.src = event.target.result;
+            path = event.target.result;
         }
         var formData = new FormData();
         formData.append("avatar_upload", file);
+
+        $("#progressbar")[0].innerHTML = '<div class="progress"><div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" style="width: 75%"></div></div>';
+        document.getElementById("modal_img_id").style.visibility = "hidden";
+        $("#image-modal").modal('show');
         $.ajax({
                url : '/avatar_upload',
                type : 'POST',
@@ -57,9 +63,21 @@ $(document).ready(function() {
                processData: false,  // tell jQuery not to process the data
                contentType: false,  // tell jQuery not to set contentType
                success : function(data) {
-                   console.log(data);
+                   console.log(data["success"]);
+                   $("#progressbar")[0].innerHTML = "";
+                   document.getElementById("modal_img_id").style.visibility = "visible";
+                    $("#image-modal").modal('hide');
+                   if (data["success"]){
+                        var img = document.getElementById("avatar");
+                        img.src = path;
+                   }
+                   else {
+                   alert("Ошибка загрузки");
+                   }
+
                }
         });
+
     });
 });
 $(document).ready(function(){

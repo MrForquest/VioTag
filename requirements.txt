@@ -5,3 +5,5 @@ Flask~=2.0.3
 Faker~=13.3.2
 numpy~=1.21.5
 scikit-learn~=1.0.2
+flask-login-0.6.0
+sqlalchemy_serializer-1.4.1

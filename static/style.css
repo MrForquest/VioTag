@@ -94,3 +94,24 @@ body{
   background: #593473 !important;
  border-color: #d000ff !important;
  }
+ .sm_avatar {
+ max-height:3em;
+ }
+ .subscribe {
+ background: #b0b0b0;
+ border-color: grey;
+ }
+ .subscribe:hover {
+ background: #9c9c9c !important;
+ border-color: grey;
+ }
+ .link_profile {
+ font-size:1.2rem;
+ color: black;
+ text-decoration: none;
+ }
+ .link_profile:hover {
+   color: grey;
+   background-color: transparent;
+   text-decoration: none;
+ }

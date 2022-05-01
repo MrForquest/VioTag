@@ -16,20 +16,29 @@ from flask_restful import reqparse, abort, Api, Resource
 from data.all_resources import *
 from sqlalchemy import or_, func, desc
 from fuzzywuzzy import process
+import logging
+import os
 
+logging.basicConfig(
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.DEBUG,
+    filename='viotag.log'
+)
+logger = logging.getLogger(__name__)
 MAX_FILE_SIZE = 1024 * 1024 * 10 + 1
 
-app = Flask(__name__)
-app.config['SECRET_KEY'] = 'werty57i39fj92udifkdb56fwed232z'
-app.config['MAX_CONTENT_LENGTH'] = MAX_FILE_SIZE
+application = Flask(__name__)
+application.config['SECRET_KEY'] = 'werty57i39fj92udifkdb56fwed232z'
+application.config['MAX_CONTENT_LENGTH'] = MAX_FILE_SIZE
 login_manager = LoginManager()
-login_manager.init_app(app)
-api = Api(app)
+login_manager.init_app(application)
+api = Api(application)
 api.add_resource(Post_resource, '/api/v1/post/<int:post_id>')
 api.add_resource(Post_list_resource, '/api/v1/posts')
 api.add_resource(Post_comments_resource, '/api/v1/comments_post/<int:post_id>')
 api.add_resource(Comment_resource, '/api/v1/comment/<int:comment_id>')
 api.add_resource(Tag_post_resource, '/api/v1/tag/<int:tag_id>')
+db_name = "db/viotag_db.sqlite"
+db_session.global_init(db_name)
 
 
 @login_manager.user_loader
@@ -38,12 +47,20 @@ def load_user(user_id):
     return db_sess.query(User).get(user_id)
 
 
-@app.route('/login', methods=['GET', 'POST'])
+@application.after_request
+def add_header(response):
+    response.headers['X-UA-Compatible'] = 'IE=Edge,chrome=1'
+    response.headers['Cache-Control'] = 'no-cache,no-store,max-age=0'
+    return response
+
+
+@application.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
     if form.validate_on_submit():
         db_sess = db_session.create_session()
         user = db_sess.query(User).filter(User.email == form.email.data).first()
+        print(121)
         if user and user.check_password(form.password.data):
             login_user(user, remember=form.remember_me.data)
             return redirect('/')
@@ -55,7 +72,7 @@ def login():
                            form=form)
 
 
-@app.route('/register', methods=['GET', 'POST'])
+@application.route('/register', methods=['GET', 'POST'])
 def reqister():
     form = RegisterForm()
     if form.validate_on_submit():
@@ -87,7 +104,7 @@ def reqister():
     return render_template('register.html', title='Регистрация', form=form)
 
 
-@app.route('/relevant_tags', methods=['GET'])
+@application.route('/relevant_tags', methods=['GET'])
 def relevant_tags():
     if request.method == 'GET':
         name_tag = request.args.get("name_tag")
@@ -105,7 +122,7 @@ def relevant_tags():
             list(map(lambda s: {"tag": [{"name": s[0][0]}, {"rs": [s[1], s[0][1]]}]}, stags)))
 
 
-@app.route('/addpost', methods=['GET', 'POST'])
+@application.route('/addpost', methods=['GET', 'POST'])
 @login_required
 def add_post():
     form = AddPostForm()
@@ -142,26 +159,34 @@ def add_post():
             db_sess.commit()
             post.src = path
         db_sess.commit()
-        return redirect("/profile")
+        return redirect(f"/profile/{current_user.username}.html")
     return render_template('add_post.html', form=form)
 
 
-@app.route('/', methods=['GET'])
+@application.route('/', methods=['GET'])
+@login_required
 def index():
     db_sess = db_session.create_session()
-    user = db_sess.query(User).get(1)
-    login_user(user, remember=True)
-    return render_template('index.html', title="Главная")
+    posts = db_sess.query(Post).filter(Post.id < 10).all()
+    user = db_sess.query(User).get(current_user.id)
+    data = dict()
+    data["title"] = "Главная"
+    data["posts"] = posts
+    data["author_id"] = user.id
+    data["posts_like_id"] = list(map(lambda u: u.id, user.favorite_posts))
+    print(data["posts_like_id"])
+    return render_template('index.html', **data)
 
 
-@app.route('/profile/<username>.html', methods=['GET', 'POST'])
+@application.route('/profile/<username>.html', methods=['GET', 'POST'])
 def profile(username):
     db_sess = db_session.create_session()
-    user = db_sess.query(User).get(2)
-    login_user(user, remember=True)
     user = db_sess.query(User).filter(User.username == username).first()
     data = dict()
-    data["title"] = "Мой профиль"
+    if user.id == current_user.id:
+        data["title"] = "Мой профиль"
+    else:
+        data["title"] = f"Профиль {username}"
     data["about"] = user.about if user.about else ""
     if user.avatar is None:
         data["avatar"] = "../static/images/default_avatar.jpg"
@@ -170,15 +195,18 @@ def profile(username):
     data["username"] = user.username
     sub = db_sess.query(Subscription).filter(Subscription.subscriber_id == current_user.id,
                                              Subscription.publisher_id == user.id).first()
-    data["u1su2"] = bool(sub)
+    user_curr = db_sess.query(User).get(current_user.id)
+    data["u1su2"] = not bool(sub)
     posts = db_sess.query(Post).filter(Post.author_id == user.id).order_by(
         desc(Post.modified_date)).all()
     data["posts"] = posts
     data["author_id"] = user.id
+    data["posts_like_id"] = list(map(lambda u: u.id, user_curr.favorite_posts))
+
     return render_template('user_profile.html', **data)
 
 
-@app.route("/avatar_upload", methods=['POST'])
+@application.route("/avatar_upload", methods=['POST'])
 def avatar_upload():
     file = request.files["avatar_upload"]
     db_sess = db_session.create_session()
@@ -186,28 +214,32 @@ def avatar_upload():
         if bool(file.filename):
             file_bytes = file.read()
             additional = file.filename.split(".")[-1]
-            path = f"static/store/{current_user.id}_{-1}_1.{additional}"
+            store_name = f"{current_user.id}_{-1}_1.{additional}"
+            if store_name in os.listdir("static/store/"):
+                os.remove(f"static/store/{store_name}")
+                store_name = f"{current_user.id}_{-2}_1.{additional}"
+            path = f"static/store/{store_name}"
             file_sv = open(path, "wb")
             file_sv.write(file_bytes)
             file_sv.close()
+            file.close()
             current_user.avatar = path
-            rows_changed = db_sess.query(User).filter_by(username=current_user.username).update(
-                dict(avatar=path))
+            user = db_sess.query(User).get(current_user.id)
+            user.avatar = path
             db_sess.commit()
         else:
             print("error")
+            return jsonify({"success": False})
     return jsonify({"success": True})
 
 
-@app.route("/subscribe_user", methods=['POST'])
+@application.route("/subscribe_user", methods=['POST'])
 def subscribe_upload():
     db_sess = db_session.create_session()
     author_id = int(request.form.get("user_id"))
     author = db_sess.query(User).get(author_id)
-    print(current_user.id, author_id)
     sub = db_sess.query(Subscription).filter(Subscription.subscriber_id == current_user.id,
                                              Subscription.publisher_id == author_id).first()
-    print(author_id, sub)
     if sub:
         print("delete")
         db_sess.delete(sub)
@@ -216,19 +248,62 @@ def subscribe_upload():
     else:
         print("add")
         sub = Subscription(subscriber_id=current_user.id, publisher_id=author_id)
-        # author.subscribers.append(sub)
-        # current_user.subscriptions.append(sub)
-        # rows_changed = db_sess.query(User).filter_by(id=current_user.id).update(
-        #   dict(subscriptions=current_user.subscriptions))
         db_sess.add(sub)
         db_sess.commit()
         return jsonify({"success": True, "subscribe": True})
 
 
+@application.route("/btn_like_click", methods=['POST'])
+def btn_like_click():
+    db_sess = db_session.create_session()
+    like_btn_id = request.form.get("like_btn_id")
+    post_id = int(like_btn_id.split("_")[2])
+    post = db_sess.query(Post).get(post_id)
+    data = dict()
+    data["success"] = True
+    user = db_sess.query(User).get(current_user.id)
+    print(post.likes)
+    if post.id in map(lambda u: u.id, user.favorite_posts):
+        post.likes.remove(user)
+        data["like"] = False
+    else:
+        print("like")
+        post.likes.append(user)
+        data["like"] = True
+    db_sess.commit()
+    return jsonify(data)
+
+
+def recommend_calc():
+    user = User()
+    tags = dict()
+    for post in user.favorite_posts:
+        for tag in post.tags:
+            tags[tag.name] = tags.get(tag.name, 0) + 1
+
+
+@application.route('/welcome', methods=['GET', 'POST'])
+def welcome():
+    db_sess = db_session.create_session()
+    data = dict()
+    data["title"] = "Добро пожаловать!"
+    return render_template('welcome.html', **data)
+
+
+@application.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect("/welcome")
+
+
+@login_manager.unauthorized_handler
+def unauthorized():
+    return redirect("/welcome")
+
+
 def main():
-    db_name = "db/viotag_db.sqlite"
-    db_session.global_init(db_name)
-    app.run(port=5000)
+    application.run(port=5000)
 
 
 if __name__ == '__main__':

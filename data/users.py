@@ -24,6 +24,8 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
     subscribers = orm.relation("Subscription", primaryjoin="User.id==Subscription.publisher_id",
                                back_populates="publisher")
     about = sqlalchemy.Column(sqlalchemy.String, nullable=True)
+    tags_weights = sqlalchemy.Column(sqlalchemy.JSON, nullable=True, default=dict())
+    tags_counter = sqlalchemy.Column(sqlalchemy.JSON, nullable=True, default=dict())
 
     def __repr__(self):
         return f"<User> {self.id} {self.username}"
@@ -33,3 +35,17 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
 
     def check_password(self, password):
         return check_password_hash(self.hashed_password, password)
+
+    def update_counts(self):
+        counter = dict()
+        for post in self.favorite_posts:
+            counter.update({tag.name: counter.get(tag.name, 0) + 1 for tag in post.tags})
+        self.tags_counter = counter
+
+    def normal_weights(self):
+        if self.tags_weights == dict():
+            return
+        max_val = max(self.tags_weights.values())
+        if max_val == 0:
+            return
+        self.tags_weights = {k: v / max_val for k, v in self.tags_weights.items()}

@@ -12,6 +12,14 @@ likes_table = sqlalchemy.Table(
     sqlalchemy.Column('posts', sqlalchemy.Integer,
                       sqlalchemy.ForeignKey('posts.id'))
 )
+viewers_table = sqlalchemy.Table(
+    'viewers_table',
+    SqlAlchemyBase.metadata,
+    sqlalchemy.Column('users', sqlalchemy.Integer,
+                      sqlalchemy.ForeignKey('users.id')),
+    sqlalchemy.Column('posts', sqlalchemy.Integer,
+                      sqlalchemy.ForeignKey('posts.id'))
+)
 
 
 class Post(SqlAlchemyBase, SerializerMixin):
@@ -26,7 +34,8 @@ class Post(SqlAlchemyBase, SerializerMixin):
     author = orm.relation('User')
     tags = orm.relation("Tag", secondary="post_to_tag", back_populates="posts")
     comments = orm.relation('Comment', back_populates="post")
-    likes = orm.relation('User', secondary="likes_table", backref="favorite_posts")
+    likes = orm.relation('User', secondary="likes_table", backref="favorite_posts", lazy='subquery')
+    viewers = orm.relation('User', secondary="viewers_table", backref="viewed")
 
     def __repr__(self):
         return f"<Post> {self.text}"

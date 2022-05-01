@@ -5,12 +5,12 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="viewport" content="width=device-width, user-scalable=no"/>
-    <title>Document</title>
+    <title>Войти в аккаунт</title>
     <link rel="stylesheet" href="../static/vendor/css/bootstrap.min.css">
 
     <script type="text/javascript" src="../static/vendor/jquery/jquery-3.6.0.min.js"></script>
     <script type="text/javascript" src="../static/vendor/js/bootstrap.min.js"></script>
-
+    <link rel="icon" href="../static/images/viotag_icon.png">
     <script src="../static/index.js"></script>
     <style>
 .btn:focus {
@@ -42,12 +42,12 @@
   -webkit-text-fill-color: transparent;
 }
 .container_reg {
-display: block;
 border-radius: 2em;
 margin-top: 2em;
 padding-top: 2em;
 padding-bottom: 1em;
- z-index: 0;
+z-index: 0;
+height: auto;
 }
 .btn {
  position: relative;
@@ -96,8 +96,6 @@ body{
 background: repeat url("../static/images/background-2.jpg");
 }
 
-
-
     </style>
 </head>
 
@@ -109,24 +107,36 @@ background: repeat url("../static/images/background-2.jpg");
             <div class="maintext_tag">Tag</div>
             <div class="ex"></div>
         </div>
-        <h3 class="mx-auto">Вход</h3>
-        <form>
+        <h3 class="text-center mx-auto">Войти в аккаунт</h3>
+        <form action="" method="post">
+            {{ form.hidden_tag() }}
             <div class="form-group">
-                <label for="InputUserName"><br>Ваш Email</label>
-                <input type="text" class="form-control" id="InputUserName"
-                       placeholder="Введите адрес электронной почты/Email">
-                <small id="nameHelp" class="form-text text-danger"></small>
+                {{ form.email.label }}<br>
+                {{ form.email(class="form-control", type="email",
+                placeholder="Введите ваш email") }}
+                {% for error in form.email.errors %}
+                <p class="alert alert-danger" role="alert">
+                    {{ error }}
+                </p>
+                {% endfor %}
             </div>
             <div class="form-group">
-                <label for="InputPassword1">Пароль</label>
-                <input type="password" class="form-control" id="InputPassword1"
-                       placeholder="Пароль">
+                {{ form.password.label }}<br>
+                {{ form.password(class="form-control", type="password",
+                placeholder="Пароль") }}
+                {% for error in form.password.errors %}
+                <p class="alert alert-danger" role="alert">
+                    {{ error }}
+                </p>
+                {% endfor %}
+                <p>{{ form.remember_me() }} {{ form.remember_me.label }}</p>
             </div>
             <div class="text-center">
                 <button type="submit" class="btn btn-primary">
-                    Войти
+                    Подтвердить
                 </button>
             </div>
+            <p class="text-danger" role="alert">{{message}}</p>
         </form>
     </div>
 </div>

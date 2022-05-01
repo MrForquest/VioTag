@@ -98,37 +98,20 @@ font: 0.9rem Helvetica, sans-serif;
 font-weight: 500;
 line-height: 0.8;
 }
-.sm_avatar {
-max-height:3em;
-}
-.subscribe {
-background: #b0b0b0;
-border-color: grey;
-}
-.subscribe:hover {
-background: #9c9c9c !important;
-border-color: grey;
-}
-.link_profile {
-font-size:1.2rem;
-color: black;
-text-decoration: none;
-}
-.link_profile:hover {
-  color: grey;
-  background-color: transparent;
-  text-decoration: none;
-}
+
+
+
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="modal fade" id="image-modal" tabindex="-1" role="dialog">
+<div class="modal" id="image-modal" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-lg" style="min-width:100%;">
         <div class="modal-content">
             <div class="modal-body mx-auto" style="min-width:100%;padding:0;">
+                <div id="progressbar"></div>
                 <img class="center-block img-fluid rounded " src=""
-                     alt="упс.. Ошибочка вышла." style="min-width:100%;">
+                     alt="упс.. Ошибочка вышла." style="min-width:100%;" id="modal_img_id">
             </div>
         </div>
     </div>
@@ -167,7 +150,13 @@ text-decoration: none;
         </div>
     </div>
     {% if username == current_user.username %}
-    <div class="col-5 col-sm-4 col-lg-2 addpost">
+    <div class="col-5 col-sm-4 col-lg-3" style="display: inline-block;position: absolute;right:30%;">
+        <a type="submit" class="btn btnvio btn-primary" style="width:100%;" href="/logout">Выйти из
+            аккаунта
+        </a>
+    </div>
+
+    <div class="col-5 col-sm-4 col-lg-2 addpost" style="display: inline-block;">
         <a type="submit" class="btn btnvio btn-primary" style="width:100%;" href="/addpost">Добавить
             пост</a>
     </div>
@@ -188,7 +177,7 @@ text-decoration: none;
                     <img class="rounded sm_avatar" style="padding:0;"
                          src="{{avatar}}">
                     <span style="margin-left:0.6rem;"
-                       >{{username}}</span>
+                    >{{username}}</span>
                 </a>
                 <p style="font-size:0.9rem;margin:0;" class="text-secondary">Время создания:
                     {{post.modified_date.strftime("%m/%d/%Y, %H:%M")}}</p>
@@ -199,7 +188,11 @@ text-decoration: none;
                     {% endfor %}
                 </div>
                 <div class="d-grid d-md-flex justify-content-md-end">
+                    {% if post.id in posts_like_id %}
+                    <button class="btn col-md-2 btn-outline-danger my_button act"
+                            {% else %}
                     <button class="btn col-md-2 btn-outline-danger my_button"
+                            {% endif %}
                             id="like_btn_{{post.id}}"
                             type="button" onclick="isClick(this.id)">
                         LIKE
