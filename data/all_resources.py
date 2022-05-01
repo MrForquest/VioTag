@@ -26,7 +26,7 @@ class Post_list_resource(Resource):
     def get(self):
         session = db_session.create_session()
         news = session.query(Post).all()
-        return jsonify({'posts': [item.to_dict() for item in news]})
+        return jsonify({'posts': [item.to_dict(only=('tags.name', "tags.id", 'text', 'author_id')) for item in news]})
 
 
 class Post_comments_resource(Resource):
@@ -34,7 +34,7 @@ class Post_comments_resource(Resource):
         abort_if_not_found(post_id, 'Post')
         session = db_session.create_session()
         post = session.query(Post).get(post_id)
-        return jsonify({'comments': post.to_dict(only=('comments'))})
+        return jsonify({'comments': post.to_dict(only=('tags.name', "tags.id", 'text', 'author_id'))})
 
 
 class Comment_resource(Resource):
@@ -42,7 +42,7 @@ class Comment_resource(Resource):
         abort_if_not_found(comm_id, 'Comment')
         session = db_session.create_session()
         comm = session.query(Comment).get(comm_id)
-        return jsonify({'comment': comm.to_dict()})
+        return jsonify({'comment': comm.to_dict(only=('modified_date', "author_id", 'text', 'post_id'))})
 
 
 class Tag_post_resource(Resource):
@@ -50,4 +50,4 @@ class Tag_post_resource(Resource):
         session = db_session.create_session()
         abort_if_not_found(tag_id, 'Tag_post')
         ret = session.query(Tag).get(tag_id).posts
-        return jsonify({'posts': [item.to_dict() for item in ret]})
+        return jsonify({'posts': [item.to_dict(only=('tags.name', "tags.id", 'text', 'author_id')) for item in ret]})
