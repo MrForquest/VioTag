@@ -49,6 +49,7 @@ color : #C71585;
 }
 
 
+
 </style>
 
 <script>
@@ -74,6 +75,7 @@ color : #C71585;
 
 
 
+
 </script>
 {% endblock %}
 
@@ -91,7 +93,7 @@ color : #C71585;
 
 <div class="col-md-6 mx-auto">
     {% for post in posts %}
-    <div class="card">
+    <div class="card" id="post_{{post.id}}">
         {% if post.src %}
         <div class="wrapper">
             <img src="../{{post.src}}"
@@ -105,9 +107,9 @@ color : #C71585;
                 <img class="rounded sm_avatar" style="padding:0;"
                      {% if post.author.avatar %}
                      src="../{{post.author.avatar}}">
-                     {% else %}
-                     src="../static/images/default_avatar.jpg">
-                     {% endif %}
+                {% else %}
+                src="../static/images/default_avatar.jpg">
+                {% endif %}
                 <span style="margin-left:0.6rem;"
                 >{{post.author.username}}</span>
             </a>

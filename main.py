@@ -10,7 +10,6 @@ from data.subscriptions import Subscription
 from data.comments import Comment
 from forms.user import RegisterForm, LoginForm
 from forms.post import AddPostForm
-from werkzeug.datastructures import MultiDict
 from sqlalchemy import or_
 from flask_restful import reqparse, abort, Api, Resource
 from data.all_resources import *
@@ -18,6 +17,7 @@ from sqlalchemy import or_, func, desc
 from fuzzywuzzy import process
 import logging
 import os
+from data.utilits import get_rmd_posts, update_all_weights
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.DEBUG,
@@ -167,14 +167,15 @@ def add_post():
 @login_required
 def index():
     db_sess = db_session.create_session()
-    posts = db_sess.query(Post).filter(Post.id < 10).all()
+    recommendations = list(map(lambda p: p[0], get_recommend_posts(15)))
+    posts = db_sess.query(Post).filter(Post.id.in_(recommendations)).all()
     user = db_sess.query(User).get(current_user.id)
     data = dict()
     data["title"] = "Главная"
     data["posts"] = posts
     data["author_id"] = user.id
     data["posts_like_id"] = list(map(lambda u: u.id, user.favorite_posts))
-    print(data["posts_like_id"])
+    # print(data["posts_like_id"])
     return render_template('index.html', **data)
 
 
@@ -262,7 +263,6 @@ def btn_like_click():
     data = dict()
     data["success"] = True
     user = db_sess.query(User).get(current_user.id)
-    print(post.likes)
     if post.id in map(lambda u: u.id, user.favorite_posts):
         post.likes.remove(user)
         data["like"] = False
@@ -274,12 +274,10 @@ def btn_like_click():
     return jsonify(data)
 
 
-def recommend_calc():
-    user = User()
-    tags = dict()
-    for post in user.favorite_posts:
-        for tag in post.tags:
-            tags[tag.name] = tags.get(tag.name, 0) + 1
+def get_recommend_posts(num):
+    update_all_weights()
+    posts_id = get_rmd_posts(current_user.id, num)
+    return posts_id
 
 
 @application.route('/welcome', methods=['GET', 'POST'])
@@ -300,6 +298,22 @@ def logout():
 @login_manager.unauthorized_handler
 def unauthorized():
     return redirect("/welcome")
+
+
+@application.route("/view_post", methods=['POST'])
+def view_post_checker():
+    db_sess = db_session.create_session()
+    post_id_viewed = request.form.get("post_id_viewed")
+    post_id = int(post_id_viewed.split("_")[1])
+    post = db_sess.query(Post).get(post_id)
+    user = db_sess.query(User).get(current_user.id)
+    if not (post in user.viewed):
+        user.viewed.append(post)
+    db_sess.commit()
+
+    data = dict()
+    data["success"] = True
+    return jsonify(data)
 
 
 def main():

@@ -1,5 +1,4 @@
 from sklearn.decomposition import NMF
-from numpy.linalg import norm
 import numpy as np
 from data import db_session
 from data.users import User
@@ -43,21 +42,12 @@ def update_all_weights():
 def get_rmd_posts(user_id, num):
     db_sess = db_session.create_session()
     user = db_sess.query(User).get(user_id)
+    update_all_weights()
     posts = db_sess.query(Post).filter(Post.id.not_in(map(lambda u: u.id, user.viewed))).all()
     post_ratings = list()
     for post in posts:
-        tags_post = set(map(lambda t: t.id, post.tags))
-        tags = tags_post.copy()
-        tags.update(set(user.tags_weights.keys()))
-        post_weights = list()
-        user_weights = list()
-        for tag in tags:
-            post_weights.append(1 if tag in tags_post else 0)
-            user_weights.append(user.tags_weights.get(tag, 0))
-        post_weights = np.array(post_weights)
-        user_weights = np.array(user_weights)
-        rating = np.dot(post_weights, user_weights) / (norm(post_weights) * norm(user_weights))
-        rating = np.nan_to_num(rating)
+        tags_post = set(map(lambda t: t.name, post.tags))
+        rating = sum([user.tags_weights.get(i, 0) for i in tags_post])
         post_ratings.append((post.id, rating))
     post_ratings.sort(key=lambda s: s[1], reverse=True)
     return post_ratings[:num]
