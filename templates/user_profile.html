@@ -98,6 +98,21 @@ font: 0.9rem Helvetica, sans-serif;
 font-weight: 500;
 line-height: 0.8;
 }
+.sub{
+    font-family: inherit;
+    display: inline-block;
+    position: absolute;
+    left:35%;
+    font-weight:500;
+    font-size: 1.1rem;
+}
+.likes {
+color:#dc3545;
+margin-right:1em;
+font-weight:500;
+font-size: 1.02rem;
+}
+
 
 
 
@@ -149,19 +164,27 @@ line-height: 0.8;
             <p class="text-center" style="font-size:1.2rem">{{about}}</p>
         </div>
     </div>
-    {% if username == current_user.username %}
-    <div class="col-6 col-sm-4 col-lg-3" style="display: inline-block;position: absolute;right:50%;">
-        <a type="submit" class="btn btnvio btn-primary" style="width:100%;" href="/logout">Выйти из
-            аккаунта
-        </a>
+    <div>
+        <div class="col-6 col-sm-4 col-lg-3 sub">
+            Подписчики: {{num_subscribers}}
+        </div>
     </div>
-
-    <div class="col-5 col-sm-4 col-lg-2 addpost" style="display: inline-block;">
-        <a type="submit" class="btn btnvio btn-primary" style="width:100%;" href="/addpost">Добавить
-            пост</a>
+    <div style="margin-top:2em;">
+        {% if username == current_user.username %}
+        <div class="col-6 col-sm-4 col-lg-3"
+             style="display: inline-block;position: absolute;left:0;">
+            <a type="submit" class="btn btnvio btn-primary" style="width:100%;" href="/logout">Выйти
+                из
+                аккаунта
+            </a>
+        </div>
+        <div class="col-5 col-sm-4 col-lg-2 addpost" style="display: inline-block;">
+            <a type="submit" class="btn btnvio btn-primary" style="width:100%;" href="/addpost">Добавить
+                пост</a>
+        </div>
     </div>
     {% endif %}
-    <div style="margin-top:3em;">
+    <div style="margin-top:5em;">
         {% for post in posts %}
         <div class="card">
             {% if post.src %}
@@ -188,6 +211,9 @@ line-height: 0.8;
                     {% endfor %}
                 </div>
                 <div class="d-grid d-md-flex justify-content-md-end">
+                    <div class="likes">
+                        Понравилось {{post.num_likes}}
+                    </div>
                     {% if post.id in posts_like_id %}
                     <button class="btn col-md-2 btn-outline-danger my_button act"
                             {% else %}

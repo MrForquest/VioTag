@@ -9,7 +9,7 @@ from data.tags import Tag
 from data.subscriptions import Subscription
 from data.comments import Comment
 from forms.user import RegisterForm, LoginForm
-from forms.post import AddPostForm
+from forms.post import AddPostForm, SearchForm
 from sqlalchemy import or_
 from flask_restful import reqparse, abort, Api, Resource
 from data.all_resources import *
@@ -169,6 +169,8 @@ def index():
     db_sess = db_session.create_session()
     recommendations = list(map(lambda p: p[0], get_recommend_posts(15)))
     posts = db_sess.query(Post).filter(Post.id.in_(recommendations)).all()
+    for p in posts:
+        p.num_likes = len(p.likes)
     user = db_sess.query(User).get(current_user.id)
     data = dict()
     data["title"] = "Главная"
@@ -194,12 +196,15 @@ def profile(username):
     else:
         data["avatar"] = "../" + user.avatar
     data["username"] = user.username
+    data["num_subscribers"] = len(user.subscribers)
     sub = db_sess.query(Subscription).filter(Subscription.subscriber_id == current_user.id,
                                              Subscription.publisher_id == user.id).first()
     user_curr = db_sess.query(User).get(current_user.id)
     data["u1su2"] = not bool(sub)
     posts = db_sess.query(Post).filter(Post.author_id == user.id).order_by(
         desc(Post.modified_date)).all()
+    for p in posts:
+        p.num_likes = len(p.likes)
     data["posts"] = posts
     data["author_id"] = user.id
     data["posts_like_id"] = list(map(lambda u: u.id, user_curr.favorite_posts))
@@ -314,6 +319,12 @@ def view_post_checker():
     data = dict()
     data["success"] = True
     return jsonify(data)
+
+
+@application.route('/search', methods=['GET', 'POST'])
+def search_post():
+    form = SearchForm()
+    return render_template('search.html', form=form)
 
 
 def main():

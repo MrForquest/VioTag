@@ -13,3 +13,9 @@ class AddPostForm(FlaskForm):
     tags = HiddenField('Теги')
     text = TextAreaField('Добавьте текста к своему посту', validators=[DataRequired()])
     submit = SubmitField('Создать')
+
+
+class SearchForm(FlaskForm):
+    tags = HiddenField('Теги')
+    text = TextAreaField('Что должен содержать текст?')
+    submit = SubmitField('Найти')
