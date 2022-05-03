@@ -182,6 +182,7 @@ def index():
 
 
 @application.route('/profile/<username>.html', methods=['GET', 'POST'])
+@login_required
 def profile(username):
     db_sess = db_session.create_session()
     user = db_sess.query(User).filter(User.username == username).first()
