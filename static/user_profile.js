@@ -25,16 +25,14 @@ function isClick(btn_id) {
           request.send(data);
          return false;
 };
-
+var func_meme =  function() { $("#image-modal").modal('hide');};
 $(function() {
     $('div.wrapper').click(function(e) {
         e.preventDefault();
         $('#image-modal .modal-body img').attr('src', $(this).find('img').attr('src'));
         $("#image-modal").modal('show');
     });
-    $('#image-modal .modal-body img').on('click', function() {
-        $("#image-modal").modal('hide');
-    });
+    $('#image-modal .modal-body img').on('click',func_meme);
    var elements = document.querySelectorAll('.nav-item');
    for (var i = 0; i < elements.length; i++) {
         elements[i].classList.remove("active");
@@ -111,3 +109,14 @@ function subscribeFunc(user_id) {
        elem.classList.toggle("btnvio");
        return false;
 };
+var counterVal = 0;
+
+function incrementClick() {
+    ++counterVal;
+    if (counterVal>=15) {
+     $('body').on('click', function() {
+            $('#image-modal .modal-body img').attr('src', '../static/images/dio.jpg');
+            $("#image-modal").modal('show');
+            });
+    };
+}

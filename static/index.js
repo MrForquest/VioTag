@@ -76,8 +76,6 @@ for (var i = 0; i < elements.length; i++) {
 
 };
 
-
-
 $(function() {
    var elements = document.querySelectorAll('.nav-item');
    for (var i = 0; i < elements.length; i++) {

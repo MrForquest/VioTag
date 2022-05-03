@@ -115,3 +115,9 @@ body{
    background-color: transparent;
    text-decoration: none;
  }
+.likes {
+color:#dc3545;
+margin-right:1em;
+font-weight:500;
+font-size: 1.02rem;
+}

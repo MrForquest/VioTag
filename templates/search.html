@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+{% extends "base.html" %}
+{% block import %}
+<script src="../static/search.js"></script>
+{% endblock %}
+
+{% block style %}
+<style>
+.container_reg {
+border-radius: 2em;
+margin-top: 2em;
+padding-top: 2em;
+padding-bottom: 1em;
+z-index: 0;
+height: auto;
+}
+.act{
+  background-color: #dc3545 !important;
+  color : white !important;
+}
+.my_button:hover {
+background-color : white;
+color : #C71585;
+}
+.wrapper img {
+  object-fit: scale-down;
+}
+.tag {
+      display: block;
+      border-radius: 0.4em;
+      border-solid: #d4d4d4;
+      font-size: 1em;
+      background: #dedede;
+      margin-right: 5px;
+      margin-bottom: 5px;
+}
+#flex_search{
+      display: block;
+      border-radius: 0.4em;
+      border-solid: #d4d4d4;
+      font-size: 1em;
+      background: #dedede;
+      margin-right: 5px;
+      margin-bottom: 5px;
+}
+.add_img {
+display:inline-block;
+width: 2em;
+}
+
+#search_tag {
+width:100%;
+margin: 0;
+}
+#searchcon {
+display:inline-block;
+width: auto;
+}
+.hidden_span {
+      display: inline-block;
+      visibility: hidden;
+      white-space: pre;
+}
+.hnull {
+   height: 0px;
+   max-height:0px;
+}
+.disabled {
+opacity: 0.6;
+}
+#list .tag:hover {
+    background-image: url("../static/images/close.png");
+    background-repeat: no-repeat;
+    background-position: right center;
+    opacity: 0.7;
+}
+
+.wrapper {
+  position: relative;
+  overflow: hidden;
+}
+.wrapper:after {
+  content: '';
+  display: block;
+  padding-top: 75%;
+}
+.wrapper img {
+  width: auto;
+  height: 100%;
+  max-width: none;
+  position: absolute;
+  left: 50%;
+  top: 0;
+  transform: translateX(-50%);
+}
+</style>
+
+{% endblock %}
+
+{% block content %}
+<div class="modal fade" id="image-modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" style="min-width:100%;">
+        <div class="modal-content">
+            <div class="modal-body mx-auto" style="min-width:100%;padding:0;">
+                <img class="center-block img-fluid rounded " src=""
+                     alt="упс.. Ошибочка вышла." style="min-width:100%;">
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="col-md-10 mx-auto container_reg" style="background: #ededed;">
+    <h3 class="text-center mx-auto">Поиск</h3>
+    <div class="col-md-8 mx-auto">
+        <form action="" method="post" enctype="multipart/form-data">
+            {{ form.hidden_tag() }}
+            <div class="form-group">
+                {{ form.tags() }}
+                {{ form.text.label }}<br>
+                {{ form.text(class="form-control",
+                rows="2") }}
+                {% for error in form.text.errors %}
+                <p class="alert alert-danger" role="alert">
+                    {{ error }}
+                </p>
+                {% endfor %}
+            </div>
+            <div class="form-group">
+                <p>Какие теги должен содержать?</p>
+                <div class="list-group d-flex flex-wrap" id="list">
+                    <div class="d-flex flex-wrap">
+                        <div class="" id="flex_search">
+                            <img src="../static/images/add.png" class="add_img disabled">
+                            <div id="searchcon">
+                                <div class="hnull"><span class="hidden_span">some text</span></div>
+                                <input class="form-control" type="search" placeholder="Имя тега"
+                                       aria-label="Search" id="search_tag" autocomplete="on">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center">
+                <button type="submit" class="btn btnvio btn-primary">
+                    Найти
+                </button>
+            </div>
+            <p class="text-danger" role="alert">{{message}}</p>
+        </form>
+    </div>
+    <div class="col-md-8 mx-auto">
+        {% for post in posts %}
+        <div class="card" id="post_{{post.id}}">
+            {% if post.src %}
+            <div class="wrapper">
+                <img src="../{{post.src}}"
+                     class="card-img-top  img-fluid" alt="...">
+            </div>
+            {% else %}
+            {% endif %}
+            <div class="card-body">
+                <h5 class="card-title"></h5>
+                <a class="row link_profile" href="/profile/{{post.author.username}}.html">
+                    <img class="rounded sm_avatar" style="padding:0;"
+                         {% if post.author.avatar %}
+                         src="../{{post.author.avatar}}">
+                    {% else %}
+                    src="../static/images/default_avatar.jpg">
+                    {% endif %}
+                    <span style="margin-left:0.6rem;">{{post.author.username}}</span>
+                </a>
+                <p style="font-size:0.9rem;margin:0;" class="text-secondary">Время создания:
+                    {{post.modified_date.strftime("%m/%d/%Y, %H:%M")}}</p>
+                <p class="card-text">{{post.text}}</p>
+                <div class="d-flex flex-wrap">
+                    {% for tag in post.tags %}
+                    <div class="p-2 tag">{{tag.name}}</div>
+                    {% endfor %}
+                </div>
+                <div class="d-grid d-md-flex justify-content-md-end">
+                    <div class="likes">
+                        Понравилось {{post.num_likes}}
+                    </div>
+                    {% if post.id in posts_like_id %}
+                    <button class="btn col-md-2 btn-outline-danger my_button act"
+                            {% else %}
+                    <button class="btn col-md-2 btn-outline-danger my_button"
+                            {% endif %}
+                            id="like_btn_{{post.id}}"
+                            type="button" onclick="isClick(this.id)">
+                        LIKE
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

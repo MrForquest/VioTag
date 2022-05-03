@@ -3,7 +3,10 @@ Werkzeug~=2.0.3
 WTForms~=3.0.1
 Flask~=2.0.3
 Faker~=13.3.2
-numpy~=1.21.5
-scikit-learn~=1.0.2
-flask-login-0.6.0
 sqlalchemy_serializer-1.4.1
+flask-login~=0.5.0
+flask-restful~=0.3.9
+sklearn~=0.0
+numpy~=1.21.5
+requests~=2.27.1
+fuzzywuzzy~=0.18.0

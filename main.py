@@ -14,7 +14,7 @@ from sqlalchemy import or_
 from flask_restful import reqparse, abort, Api, Resource
 from data.all_resources import *
 from sqlalchemy import or_, func, desc
-from fuzzywuzzy import process
+from fuzzywuzzy import fuzz, process
 import logging
 import os
 from data.utilits import get_rmd_posts, update_all_weights
@@ -167,7 +167,7 @@ def add_post():
 @login_required
 def index():
     db_sess = db_session.create_session()
-    recommendations = list(map(lambda p: p[0], get_recommend_posts(15)))
+    recommendations = list(map(lambda p: p[0], get_recommend_posts(30)))
     posts = db_sess.query(Post).filter(Post.id.in_(recommendations)).all()
     for p in posts:
         p.num_likes = len(p.likes)
@@ -324,7 +324,58 @@ def view_post_checker():
 @application.route('/search', methods=['GET', 'POST'])
 def search_post():
     form = SearchForm()
+    if form.validate_on_submit():
+        db_sess = db_session.create_session()
+        text = form.text.data.lower()
+        tags_names = set(form.tags.data.split(";"))
+        posts = db_sess.query(Post).all()
+        res = list()
+        print(tags_names)
+        if tags_names != {''}:
+            for post in posts:
+                tags = set(map(lambda t: t.name, post.tags))
+                if tags_names <= tags:
+                    res.append(post)
+        if not res and tags_names != {''}:
+            res = list()
+        else:
+            res = res if res else posts
+
+        if text:
+            res = sorted(
+                map(lambda p: (
+                fuzz.partial_ratio(p.author.username.lower() + " " + p.text.lower(), text.lower()),
+                p),
+                    res), reverse=True, key=lambda s: s[0])[:200]
+            res = list(map(lambda p: p[1], res))
+        for p in res:
+            p.num_likes = len(p.likes)
+        user = db_sess.query(User).get(current_user.id)
+        data = dict()
+        data["title"] = "Поиск"
+        data["posts"] = res
+        data["author_id"] = user.id
+        data["posts_like_id"] = list(map(lambda u: u.id, user.favorite_posts))
+        return render_template('search.html', **data, form=form)
+
     return render_template('search.html', form=form)
+
+
+@application.route('/subscriptions', methods=['GET', 'POST'])
+def subscriptions():
+    db_sess = db_session.create_session()
+    user = db_sess.query(User).get(current_user.id)
+    subr = [s.publisher.id for s in user.subscriptions]
+    print(subr)
+    posts = db_sess.query(Post).filter(Post.author_id.in_(subr)).order_by(
+        desc(Post.modified_date)).all()
+    for p in posts:
+        p.num_likes = len(p.likes)
+    data = dict()
+    data["title"] = "Подписки"
+    data["posts"] = posts
+    data["posts_like_id"] = list(map(lambda u: u.id, user.favorite_posts))
+    return render_template('subs.html', **data)
 
 
 def main():
